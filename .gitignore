@@ -1,0 +1,11 @@
+bin
+obj
+packages/**/*
+*.suo
+*resharper*
+build
+binaries
+release
+Upgradelog*
+_Upgrade*
+TestResult.xml
