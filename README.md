@@ -2,7 +2,7 @@ ObjectFilter
 ============
 
 This utility allows you to pass in an object and get a pared down object in return based on the filters you pass in.
-is is useful in a web api where you allow the caller to specify which fields they want back to limit the size of the data being serialized over the wire.
+It is useful in a web api where you allow the caller to specify which fields they want back to limit the size of the data being serialized over the wire.
 The syntax and usage is based on the [google+ partial responses API](https://developers.google.com/+/api/#partial-responses) syntax.
 
 If you were to start with his object:
