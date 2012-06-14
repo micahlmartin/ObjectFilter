@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -8,44 +9,93 @@ namespace ObjectFilter
 {
     internal class Filter
     {
-        private string _Originalfilter;
-        private IList<FilterParts> _expandedFilters = new List<FilterParts>();
-
-        public Filter(string filter)
+        private Filter(string filter, bool isSubselect)
         {
-            _Originalfilter = filter;
+            var parts = GetFilterParts(filter);
+            ParentName = parts.Parent;
+            LeafName = parts.Leaf;
+            FullName = filter;
+            IsSubselect = isSubselect;
+        }
+
+        public string ParentName { get; set; }
+        public string LeafName { get; set; }
+        public string FullName { get; set; }
+        public bool IsSubselect { get; set; }
+
+        public MatchType Match(string name)
+        {
+            if (IsAll)
+                return MatchType.All;
+
+            if (name == FullName)
+                return MatchType.Exact;
+
+            if (name == ParentName)
+                return MatchType.Partial;
+
+            var parts = GetFilterParts(name);
+            if (parts.Parent == ParentName)
+            {
+                if (IsSubselect)
+                    return MatchType.Override;
+
+                return MatchType.Partial;
+            }
+
+            return MatchType.None;
+        }
+
+        private bool IsAll { get { return LeafName == "*"; } }
+        private dynamic GetFilterParts(string filter)
+        {
+            dynamic parts = new ExpandoObject();
+            parts.Parent = "";
+            parts.Leaf = "";
+
+            var index = filter.LastIndexOf('/');
+            if (index > -1)
+            {
+                parts.Parent = filter.Substring(0, index);
+                parts.Leaf = filter.Substring(index + 1);
+            }
+            else
+                parts.Leaf = filter;
+
+            return parts;
+        }
+
+        public static IEnumerable<Filter> Create(string[] filters)
+        {
+            var filterList = new List<Filter>();
+
+            foreach (var filter in filters)
+                filterList.AddRange(Create(filter));
+
+            return filterList;
+        }
+        public static IEnumerable<Filter> Create(string filter)
+        {
+            if (string.IsNullOrEmpty(filter))
+                return Enumerable.Empty<Filter>();
 
             if (SubSelector.IsMatch(filter))
-                ProcessSubSelector(filter);
-            else
-                _expandedFilters.Add(new FilterParts(filter));
-        }
+                return GetFiltersFromSubSelector(filter);
 
-        public bool IsMatch(FilterParts filterParts)
-        {
-            return _expandedFilters.Any(x => x.ParentName == filterParts.ParentName && (x.LeafName == filterParts.LeafName || x.IsAll));
+            return new List<Filter> { new Filter(filter, false) };
         }
-
-        private FilterParts GetMatchFilterParts(string name)
-        {
-            FilterParts filterParts;
-            if (!_matchFilterPartsCache.TryGetValue(name, out filterParts))
-            {
-                filterParts = new FilterParts(name);
-                _matchFilterPartsCache.Add(name, filterParts);
-            }
-            return filterParts;
-        }
-        private void ProcessSubSelector(string filter)
+        private static IEnumerable<Filter> GetFiltersFromSubSelector(string filter)
         {
             var match = SubSelector.Match(filter);
             var name = match.Groups["node"].Value;
             var leaves = match.Groups["leaves"].Value.Trim('(', ')').Split(',');
 
+            var filters = new List<Filter>();
             foreach (var leaf in leaves)
-                _expandedFilters.Add(new FilterParts(string.Join("/", name, leaf)));
+                filters.Add(new Filter(string.Join("/", name, leaf), true));
+
+            return filters;
         }
-        private IDictionary<string, FilterParts> _matchFilterPartsCache = new Dictionary<string, FilterParts>();
         private static Regex SubSelector = new Regex(@"^(?<node>[\w]+/?\w+)\((?<leaves>[\w|,]+)\)$");
     }
 }

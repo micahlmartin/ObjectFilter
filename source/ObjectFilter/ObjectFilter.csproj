@@ -43,7 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Filter.cs" />
-    <Compile Include="FilterParts.cs" />
+    <Compile Include="MatchType.cs" />
     <Compile Include="ObjectFilter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

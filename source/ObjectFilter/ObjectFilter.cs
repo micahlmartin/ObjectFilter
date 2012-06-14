@@ -17,12 +17,7 @@ namespace ObjectFilter
         public ObjectFilter(object source, string[] filters)
         {
             _source = source;
-            _filters = GetFilters(filters);
-        }
-
-        private IEnumerable<Filter> GetFilters(string[] filters)
-        {
-            return filters.Select(x => new Filter(x)).ToList();
+            _filters = Filter.Create(filters);
         }
 
         /// <summary>
@@ -56,24 +51,46 @@ namespace ObjectFilter
         {
             var currentName = GetParentName(parentName, node);
 
-            if (IsMatch(currentName))
-                return;
+            var matchResult = IsMatch(currentName);
+            if(matchResult.HasValue && matchResult.Value)
+                return; //We have a match
 
-            if (node.HasElements)
+            //We may have a partial match
+            if (node.HasElements && matchResult.HasValue)
             {
                 foreach (var child in node.Elements())
                 {
                     Process(currentName, child);
                 }
             }
-            else
+            else //We either have no match or an override
                 _elementsToDelete.Add(node);
         }
 
-        private bool IsMatch(string name)
+        private bool? IsMatch(string name)
         {
-            var filterParts = new FilterParts(name);
-            return _filters.Any(x => x.IsMatch(filterParts));
+            var matchingFilters = _filters.Select(x => x.Match(name)).Where(x => x != MatchType.None).ToList();
+
+            //No matches so move on
+            if (!matchingFilters.Any())
+                return false;
+
+            //We've got an exact match so we're good
+            if (matchingFilters.Any(x => x == MatchType.Exact))
+                return true;
+
+            //We have a partial match, so let's keep checking.
+            //It means we're a node that has children and we have a more specific filter 
+            if (matchingFilters.Any(x => x == MatchType.Partial))
+                return false;
+
+            //We have a subselect filter and we have a match on the parent
+            //But we don't want the * filter to grab it, so we need to get out.
+            //This happens when a * and subselect are combined: *,a/b(c,d)
+            if (matchingFilters.Any(x => x == MatchType.Override))
+                return null;
+
+            return true;
         }
         private string GetParentName(string currentParentName, XElement node)
         {
