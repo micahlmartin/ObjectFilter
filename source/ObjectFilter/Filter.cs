@@ -67,7 +67,7 @@ namespace ObjectFilter
             return parts;
         }
 
-        public static IEnumerable<Filter> Create(string[] filters)
+        public static IEnumerable<Filter> Create(IEnumerable<string> filters)
         {
             var filterList = new List<Filter>();
 

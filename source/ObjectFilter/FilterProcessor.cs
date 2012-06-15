@@ -13,7 +13,7 @@ namespace ObjectFilter
         private object _source;
         private IEnumerable<Filter> _filters;
 
-        public FilterProcessor(object source, string[] filters)
+        public FilterProcessor(object source, IEnumerable<string> filters)
         {
             _source = source;
             _filters = Filter.Create(filters);
