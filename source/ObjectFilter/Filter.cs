@@ -25,7 +25,9 @@ namespace ObjectFilter
 
         public MatchType Match(string name)
         {
-            if (IsAll)
+            var parts = GetFilterParts(name);
+
+            if (IsAll && ParentName == parts.Parent)
                 return MatchType.All;
 
             if (name == FullName)
@@ -34,7 +36,7 @@ namespace ObjectFilter
             if (name == ParentName)
                 return MatchType.Partial;
 
-            var parts = GetFilterParts(name);
+            
             if (parts.Parent == ParentName)
             {
                 if (IsSubselect)

@@ -48,7 +48,7 @@ namespace ObjectFilter.Tests
         }
 
         [Test]
-        public void SingleProperty()
+        public void MultipleProperties()
         {
             var filters = new[] { "Property1", "SubObject/Property2", "SubObject/SubObject/Property3" };
             var filter = new ObjectFilter(TestData, filters);
@@ -67,7 +67,7 @@ namespace ObjectFilter.Tests
         }
 
         [Test]
-        public void MultipleSubProperties()
+        public void MultipleSubPropertiesWithSubSelect()
         {
             var filters = new[] { "*", "SubObject(Property1,Property2)"};
             var filter = new ObjectFilter(TestData, filters);
@@ -81,6 +81,91 @@ namespace ObjectFilter.Tests
             Assert.IsNull(result.SubObject.Property3);
             Assert.IsNull(result.SubObject.SubObject);
         }
+
+        [Test]
+        public void MultipleSubProperties()
+        {
+            var filters = new[] { "*", "SubObject/Property1", "SubObject/SubObject/Property3" };
+            var filter = new ObjectFilter(TestData, filters);
+
+            var result = filter.Process<TestObject>();
+            Assert.AreEqual("1", result.Property1);
+            Assert.AreEqual("2", result.Property2);
+            Assert.AreEqual("3", result.Property3); 
+            Assert.AreEqual("S1", result.SubObject.Property1);
+            Assert.IsNull(result.SubObject.Property2);
+            Assert.IsNull(result.SubObject.Property3);
+            Assert.IsNull(result.SubObject.SubObject.Property1);
+            Assert.IsNull(result.SubObject.SubObject.Property2);
+            Assert.AreEqual("SS3", result.SubObject.SubObject.Property3);
+        }
+
+        [Test]
+        public void NestedSubProperties()
+        {
+            var filters = new[] { "Property1", "SubObject/SubObject(Property1,Property2)" };
+            var filter = new ObjectFilter(TestData, filters);
+
+            var result = filter.Process<TestObject>();
+            Assert.AreEqual("1", result.Property1);
+            Assert.IsNull(result.Property2);
+            Assert.IsNull(result.Property3);
+            Assert.IsNull(result.SubObject.Property1);
+            Assert.IsNull(result.SubObject.Property2);
+            Assert.IsNull(result.SubObject.Property3);
+            Assert.AreEqual("SS1", result.SubObject.SubObject.Property1);
+            Assert.AreEqual("SS2", result.SubObject.SubObject.Property2);
+            Assert.IsNull(result.SubObject.SubObject.Property3);
+
+        }
+
+        [Test]
+        public void SingleProperty()
+        {
+            var filters = new[] { "Property1" };
+            var filter = new ObjectFilter(TestData, filters);
+
+            var result = filter.Process<TestObject>();
+            Assert.AreEqual("1", result.Property1);
+            Assert.IsNull(result.Property2);
+            Assert.IsNull(result.Property3);
+            Assert.IsNull(result.SubObject);
+        }
+
+        [Test]
+        public void SingleSubProperty()
+        {
+            var filters = new[] { "SubObject/Property1" };
+            var filter = new ObjectFilter(TestData, filters);
+
+            var result = filter.Process<TestObject>();
+            Assert.IsNull(result.Property1);
+            Assert.IsNull(result.Property2);
+            Assert.IsNull(result.Property3);
+            Assert.AreEqual("S1", result.SubObject.Property1);
+            Assert.IsNull(result.SubObject.Property2);
+            Assert.IsNull(result.SubObject.Property3);
+            Assert.IsNull(result.SubObject.SubObject);
+        }
+
+        [Test]
+        public void SubElementsWithWildcard()
+        {
+            var filters = new[] { "SubObject/*", "SubObject/SubObject/Property1" };
+            var filter = new ObjectFilter(TestData, filters);
+
+            var result = filter.Process<TestObject>();
+            Assert.IsNull(result.Property1);
+            Assert.IsNull(result.Property2);
+            Assert.IsNull(result.Property3);
+            Assert.AreEqual("S1", result.SubObject.Property1);
+            Assert.AreEqual("S2", result.SubObject.Property2);
+            Assert.AreEqual("S3", result.SubObject.Property3);
+            Assert.AreEqual("SS1", result.SubObject.SubObject.Property1);
+            Assert.IsNull(result.SubObject.SubObject.Property2);
+            Assert.IsNull(result.SubObject.SubObject.Property3);
+        }
+
     }
 
     public class TestObject

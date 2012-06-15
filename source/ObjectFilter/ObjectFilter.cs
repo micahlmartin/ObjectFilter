@@ -12,7 +12,6 @@ namespace ObjectFilter
     {
         private object _source;
         private IEnumerable<Filter> _filters;
-        private List<XElement> _elementsToDelete;
 
         public ObjectFilter(object source, string[] filters)
         {
@@ -26,15 +25,15 @@ namespace ObjectFilter
         /// <returns></returns>
         public XDocument Process()
         {
-            _elementsToDelete = new List<XElement>();
-
             var xmlDoc = GetObjectXml(_source);
 
-            foreach (var node in xmlDoc.Root.Elements())
-                Process(null, node);
+            var childrenToDelete = new List<XElement>();
 
-            foreach (var el in _elementsToDelete)
-                el.Remove();
+            foreach (var node in xmlDoc.Root.Elements())
+                Process(null, node, childrenToDelete);
+
+            foreach (var deletion in childrenToDelete)
+                deletion.Remove();
 
             return xmlDoc;
         }
@@ -47,24 +46,34 @@ namespace ObjectFilter
                 return (T)serializer.Deserialize(rdr);
         }
 
-        private void Process(string parentName, XElement node)
+        private void Process(string parentName, XElement node, List<XElement> elementsToDelete)
         {
             var currentName = GetParentName(parentName, node);
 
             var matchResult = IsMatch(currentName);
-            if(matchResult.HasValue && matchResult.Value)
+            if (matchResult.HasValue && matchResult.Value)
                 return; //We have a match
 
             //We may have a partial match
+            //Walk the children and find more matches 
+            //I <3 recursion
             if (node.HasElements && matchResult.HasValue)
             {
+                var childrenToDelete = new List<XElement>();
+
                 foreach (var child in node.Elements())
                 {
-                    Process(currentName, child);
+                    Process(currentName, child, childrenToDelete);
                 }
+
+                foreach (var deletion in childrenToDelete)
+                    deletion.Remove();
+
+                if (node.IsEmpty)
+                    elementsToDelete.Add(node);
             }
-            else //We either have no match or an override
-                _elementsToDelete.Add(node);
+            else //We either have no match or an override. Mark the item for deletion.
+                elementsToDelete.Add(node);
         }
 
         private bool? IsMatch(string name)
