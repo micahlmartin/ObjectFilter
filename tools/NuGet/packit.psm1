@@ -6,7 +6,10 @@ $script:packit.default_package = "ObjectFilter"
 $script:packit.package_owners = "Micah Martin"
 $script:packit.package_authors = "Micah Martin"
 $script:packit.package_description = "ObjectFilter"
-$script:packit.release_notes = "Removed dependency on log4net\nRenamed ObjectFilter to FilterProcessor."
+$script:packit.release_notes = @"
+Removed dependency on log4net
+Renamed ObjectFilter to FilterProcessor.
+"@
 $script:packit.package_language = "en-US"
 $script:packit.package_licenseUrl = "https://github.com/micahlmartin/ObjectFilter"
 $script:packit.package_projectUrl = "https://github.com/micahlmartin/ObjectFilter"
