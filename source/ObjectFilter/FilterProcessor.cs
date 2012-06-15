@@ -8,12 +8,12 @@ using System.Xml.Serialization;
 
 namespace ObjectFilter
 {
-    public class ObjectFilter
+    public class FilterProcessor
     {
         private object _source;
         private IEnumerable<Filter> _filters;
 
-        public ObjectFilter(object source, string[] filters)
+        public FilterProcessor(object source, string[] filters)
         {
             _source = source;
             _filters = Filter.Create(filters);

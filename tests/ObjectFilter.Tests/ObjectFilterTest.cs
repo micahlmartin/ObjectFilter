@@ -38,7 +38,7 @@ namespace ObjectFilter.Tests
         public void Wildcard()
         {
             var filters = new[] { "*" };
-            var filter = new ObjectFilter(TestData, filters);
+            var filter = new FilterProcessor(TestData, filters);
 
             var result = filter.Process<TestObject>();
             Assert.AreEqual(result.Property1, "1");
@@ -51,7 +51,7 @@ namespace ObjectFilter.Tests
         public void MultipleProperties()
         {
             var filters = new[] { "Property1", "SubObject/Property2", "SubObject/SubObject/Property3" };
-            var filter = new ObjectFilter(TestData, filters);
+            var filter = new FilterProcessor(TestData, filters);
 
             var result = filter.Process<TestObject>();
             Assert.AreEqual("1", result.Property1);
@@ -70,7 +70,7 @@ namespace ObjectFilter.Tests
         public void MultipleSubPropertiesWithSubSelect()
         {
             var filters = new[] { "*", "SubObject(Property1,Property2)"};
-            var filter = new ObjectFilter(TestData, filters);
+            var filter = new FilterProcessor(TestData, filters);
 
             var result = filter.Process<TestObject>();
             Assert.AreEqual("1", result.Property1);
@@ -86,7 +86,7 @@ namespace ObjectFilter.Tests
         public void MultipleSubProperties()
         {
             var filters = new[] { "*", "SubObject/Property1", "SubObject/SubObject/Property3" };
-            var filter = new ObjectFilter(TestData, filters);
+            var filter = new FilterProcessor(TestData, filters);
 
             var result = filter.Process<TestObject>();
             Assert.AreEqual("1", result.Property1);
@@ -104,7 +104,7 @@ namespace ObjectFilter.Tests
         public void NestedSubProperties()
         {
             var filters = new[] { "Property1", "SubObject/SubObject(Property1,Property2)" };
-            var filter = new ObjectFilter(TestData, filters);
+            var filter = new FilterProcessor(TestData, filters);
 
             var result = filter.Process<TestObject>();
             Assert.AreEqual("1", result.Property1);
@@ -123,7 +123,7 @@ namespace ObjectFilter.Tests
         public void SingleProperty()
         {
             var filters = new[] { "Property1" };
-            var filter = new ObjectFilter(TestData, filters);
+            var filter = new FilterProcessor(TestData, filters);
 
             var result = filter.Process<TestObject>();
             Assert.AreEqual("1", result.Property1);
@@ -136,7 +136,7 @@ namespace ObjectFilter.Tests
         public void SingleSubProperty()
         {
             var filters = new[] { "SubObject/Property1" };
-            var filter = new ObjectFilter(TestData, filters);
+            var filter = new FilterProcessor(TestData, filters);
 
             var result = filter.Process<TestObject>();
             Assert.IsNull(result.Property1);
@@ -152,7 +152,7 @@ namespace ObjectFilter.Tests
         public void SubElementsWithWildcard()
         {
             var filters = new[] { "SubObject/*", "SubObject/SubObject/Property1" };
-            var filter = new ObjectFilter(TestData, filters);
+            var filter = new FilterProcessor(TestData, filters);
 
             var result = filter.Process<TestObject>();
             Assert.IsNull(result.Property1);

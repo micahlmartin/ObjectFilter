@@ -57,7 +57,7 @@ var myobj = new {
 	}
 };
 var filters = new[] { "*","SubObject/Prop2" };
-var objFilter = new ObjectFilter(myobj, filters);
+var processor = new FilterProcessor(myobj, filters);
 var result = objFilter.Process();
 ```
 
