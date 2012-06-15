@@ -20,7 +20,7 @@ $script:isEnvironmentInitialized = $false
 $script:ilmergeTargetFramework = ""
 $script:msBuildTargetFramework = ""	
 $ilMergeKey = "$srcDir\NServiceBus.snk"
-$script:packageVersion = "0.0.1.2"
+$script:packageVersion = "0.0.1.3"
 $nunitexec = "packages\NUnit.Runners.lite.2.6.0.12051\nunit-console.exe"
 $script:nunitTargetFramework = "/framework=4.0";
 
@@ -131,7 +131,7 @@ task CreatePackages -depends PrepareRelease  {
 	#region Packing NServiceBus
 	$packageName = "ObjectFilter"
 	$packit.package_description = "A utility for filtering objects based on the google+ partial response API"
-	invoke-packit $packageName $script:packageVersion @{log4net="[2.0.0]"} "binaries\ObjectFilter.dll" @{} 
+	invoke-packit $packageName $script:packageVersion @{} "binaries\ObjectFilter.dll" @{} 
 	#endregion
 		
 	remove-module packit
