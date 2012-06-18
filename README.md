@@ -68,7 +68,7 @@ var filters = new[] { "*","SubObject/Prop2" };
 var processor = new FilterProcessor(myobj, filters);
 ```
 
-Returns an instance of the same type but with NULL or default values for any property that was ignored  
-```
-var result = objFilter.Process<TestObject>();
-```
+The preferred methods that execute the filter are `ProcessAsJson` and `ProcessAsXml`. Both of them return a string that can get be sent directly over the wire.  
+
+If you need to further operate on the object then `Process<T>()` and `Process(Type type)` will return you an instance of the specified type. It must be of the
+same type that you are filtering otherwise an exception will be thrown.
