@@ -66,6 +66,7 @@ var myobj = new TestObject {
 
 var filters = new[] { "*","SubObject/Prop2" };
 var processor = new FilterProcessor(myobj, filters);
+var json processor.ProcessAsJson();
 ```
 
 The preferred methods that execute the filter are `ProcessAsJson` and `ProcessAsXml`. Both of them return a string that can get be sent directly over the wire.  
