@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using Newtonsoft.Json;
 
 namespace ObjectFilter
 {
@@ -37,10 +38,47 @@ namespace ObjectFilter
         /// Filters the object
         /// </summary>
         /// <typeparam name="T">The type of the object being filtered</typeparam>
-        /// <returns>A filtered instance of <typeparamref name="T"/></returns>
+        /// <returns>
+        /// A filtered instance of <typeparamref name="T"/>. 
+        /// If the filtered object cannot be cast as type <typeparamref name="T"/> then an exception will be thrown.
+        /// </returns>
         public T Process<T>()
         {
             return (T)Process();
+        }
+
+        /// <summary>
+        /// Filters the object and returns the result as a Json string
+        /// </summary>
+        /// <returns>A Json string of the filtered object</returns>
+        public string ProcessAsJson()
+        {
+            var result = ProcessFilters();
+            var namespaces = new List<XAttribute>();
+            namespaces.AddRange(result.Root.Attributes());
+
+            foreach (var ns in namespaces)
+                ns.Remove();
+
+            return JsonConvert.SerializeXNode(result.Root, Formatting.Indented, true);
+        }
+
+        /// <summary>
+        /// Filters the object and returns the result as an xml string
+        /// </summary>
+        /// <returns>An xml string of the filtered object</returns>
+        public string ProcessAsXml()
+        {
+            return ProcessFilters().ToString();
+        }
+
+        /// <summary>
+        /// Filters the object and returns it as an <see cref="XDocument"/>
+        /// </summary>
+        /// <returns>An <see cref="XDocument"/> of the filtered object</returns>
+        public XDocument ProcessAsXDocument()
+        {
+            return ProcessFilters();
         }
 
         private XDocument ProcessFilters()

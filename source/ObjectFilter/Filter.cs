@@ -69,12 +69,18 @@ namespace ObjectFilter
 
         public static IEnumerable<Filter> Create(IEnumerable<string> filters)
         {
+            if (filters == null)
+                throw new ArgumentNullException("filters");
+
+            if (filters.Count() == 0)
+                throw new ArgumentException("At least 1 filter must be specified", "filters");
+
             var filterList = new List<Filter>();
 
             foreach (var filter in filters)
                 filterList.AddRange(Create(filter));
 
-            return filterList;
+            return filterList   ;
         }
         public static IEnumerable<Filter> Create(string filter)
         {
