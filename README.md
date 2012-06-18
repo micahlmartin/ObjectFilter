@@ -48,17 +48,27 @@ Usage
 -----
 
 ```
-var myobj = new {
+public class TestObject
+{
+	public string Property1 { get; set; }
+	public string Property2 { get; set; }
+	public TestObject SubObject { get; set; }
+}
+
+var myobj = new TestObject {
 	Property1 = "1",
 	Property2 = "1",
-	SubObject = new {
-	    Prop1 = "1",
-		Prop2 = "2"
+	SubObject = new TestObject {
+	    Property1 = "1",
+		Property2 = "2"
 	}
 };
+
 var filters = new[] { "*","SubObject/Prop2" };
 var processor = new FilterProcessor(myobj, filters);
-var result = objFilter.Process();
 ```
 
-You get an XDocument back from the `Process` method which you can then either serialize over the wire as is, convert to JSON, or optionally call the `Process<T>()` method and have it deserialized to a custom object;
+Returns an instance of the same type but with NULL or default values for any property that was ignored  
+```
+var result = objFilter.Process<TestObject>();
+```
