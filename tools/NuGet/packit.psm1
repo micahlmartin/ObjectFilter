@@ -9,6 +9,7 @@ $script:packit.package_description = "ObjectFilter"
 $script:packit.release_notes = @"
 Removed dependency on log4net
 Renamed ObjectFilter to FilterProcessor.
+Reconfigured serialization
 "@
 $script:packit.package_language = "en-US"
 $script:packit.package_licenseUrl = "https://github.com/micahlmartin/ObjectFilter"

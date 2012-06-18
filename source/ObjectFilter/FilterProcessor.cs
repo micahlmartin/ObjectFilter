@@ -20,10 +20,30 @@ namespace ObjectFilter
         }
 
         /// <summary>
-        /// Processes the filter
+        /// Filters the object
         /// </summary>
-        /// <returns></returns>
-        public XDocument Process()
+        /// <returns>A filtered instance of the object</returns>
+        public object Process()
+        {
+            var result = ProcessFilters();
+
+            var serializer = new XmlSerializer(_source.GetType());
+
+            using (var rdr = result.CreateReader())
+                return serializer.Deserialize(rdr);
+        }
+
+        /// <summary>
+        /// Filters the object
+        /// </summary>
+        /// <typeparam name="T">The type of the object being filtered</typeparam>
+        /// <returns>A filtered instance of <typeparamref name="T"/></returns>
+        public T Process<T>()
+        {
+            return (T)Process();
+        }
+
+        private XDocument ProcessFilters()
         {
             var xmlDoc = GetObjectXml(_source);
 
@@ -36,14 +56,6 @@ namespace ObjectFilter
                 deletion.Remove();
 
             return xmlDoc;
-        }
-
-        public T Process<T>()
-        {
-            var result = Process();
-            var serializer = new XmlSerializer(typeof(T));
-            using (var rdr = result.CreateReader())
-                return (T)serializer.Deserialize(rdr);
         }
 
         private void Process(string parentName, XElement node, List<XElement> elementsToDelete)

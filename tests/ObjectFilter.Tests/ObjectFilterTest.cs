@@ -18,17 +18,17 @@ namespace ObjectFilter.Tests
             {
                 Property1 = "1",
                 Property2 = "2",
-                Property3 = "3",
+                Property3 = 3,
                 SubObject = new TestObject
                 {
                     Property1 = "S1",
                     Property2 = "S2",
-                    Property3 = "S3",
+                    Property3 = 3,
                     SubObject = new TestObject
                     {
                         Property1 = "SS1",
                         Property2 = "SS2",
-                        Property3 = "SS3"
+                        Property3 = 3
                     }
                 }
             };
@@ -43,7 +43,7 @@ namespace ObjectFilter.Tests
             var result = filter.Process<TestObject>();
             Assert.AreEqual(result.Property1, "1");
             Assert.AreEqual(result.SubObject.Property2, "S2");
-            Assert.AreEqual(result.SubObject.SubObject.Property3, "SS3");
+            Assert.AreEqual(result.SubObject.SubObject.Property3, 3);
             Assert.IsNull(result.SubObject.SubObject.SubObject);
         }
 
@@ -56,11 +56,11 @@ namespace ObjectFilter.Tests
             var result = filter.Process<TestObject>();
             Assert.AreEqual("1", result.Property1);
             Assert.IsNull(result.Property2);
-            Assert.IsNull(result.Property3);
+            Assert.AreEqual(0, result.Property3);
             Assert.AreEqual("S2", result.SubObject.Property2);
             Assert.IsNull(result.SubObject.Property1);
-            Assert.IsNull(result.SubObject.Property3);
-            Assert.AreEqual("SS3", result.SubObject.SubObject.Property3);
+            Assert.AreEqual(0, result.SubObject.Property3);
+            Assert.AreEqual(3, result.SubObject.SubObject.Property3);
             Assert.IsNull(result.SubObject.SubObject.Property1);
             Assert.IsNull(result.SubObject.SubObject.Property2);
             Assert.IsNull(result.SubObject.SubObject.SubObject);
@@ -75,10 +75,10 @@ namespace ObjectFilter.Tests
             var result = filter.Process<TestObject>();
             Assert.AreEqual("1", result.Property1);
             Assert.AreEqual( "2", result.Property2);
-            Assert.AreEqual(result.Property3, "3");
+            Assert.AreEqual(3, result.Property3);
             Assert.AreEqual("S1", result.SubObject.Property1);
             Assert.AreEqual("S2", result.SubObject.Property2);
-            Assert.IsNull(result.SubObject.Property3);
+            Assert.AreEqual(0, result.SubObject.Property3);
             Assert.IsNull(result.SubObject.SubObject);
         }
 
@@ -91,13 +91,13 @@ namespace ObjectFilter.Tests
             var result = filter.Process<TestObject>();
             Assert.AreEqual("1", result.Property1);
             Assert.AreEqual("2", result.Property2);
-            Assert.AreEqual("3", result.Property3); 
+            Assert.AreEqual(3, result.Property3); 
             Assert.AreEqual("S1", result.SubObject.Property1);
             Assert.IsNull(result.SubObject.Property2);
-            Assert.IsNull(result.SubObject.Property3);
+            Assert.AreEqual(0, result.SubObject.Property3);
             Assert.IsNull(result.SubObject.SubObject.Property1);
             Assert.IsNull(result.SubObject.SubObject.Property2);
-            Assert.AreEqual("SS3", result.SubObject.SubObject.Property3);
+            Assert.AreEqual(3, result.SubObject.SubObject.Property3);
         }
 
         [Test]
@@ -109,13 +109,13 @@ namespace ObjectFilter.Tests
             var result = filter.Process<TestObject>();
             Assert.AreEqual("1", result.Property1);
             Assert.IsNull(result.Property2);
-            Assert.IsNull(result.Property3);
+            Assert.AreEqual(0, result.Property3);
             Assert.IsNull(result.SubObject.Property1);
             Assert.IsNull(result.SubObject.Property2);
-            Assert.IsNull(result.SubObject.Property3);
+            Assert.AreEqual(0, result.SubObject.Property3);
             Assert.AreEqual("SS1", result.SubObject.SubObject.Property1);
             Assert.AreEqual("SS2", result.SubObject.SubObject.Property2);
-            Assert.IsNull(result.SubObject.SubObject.Property3);
+            Assert.AreEqual(0, result.SubObject.SubObject.Property3);
 
         }
 
@@ -128,7 +128,7 @@ namespace ObjectFilter.Tests
             var result = filter.Process<TestObject>();
             Assert.AreEqual("1", result.Property1);
             Assert.IsNull(result.Property2);
-            Assert.IsNull(result.Property3);
+            Assert.AreEqual(0, result.Property3);
             Assert.IsNull(result.SubObject);
         }
 
@@ -141,10 +141,10 @@ namespace ObjectFilter.Tests
             var result = filter.Process<TestObject>();
             Assert.IsNull(result.Property1);
             Assert.IsNull(result.Property2);
-            Assert.IsNull(result.Property3);
+            Assert.AreEqual(0, result.Property3);
             Assert.AreEqual("S1", result.SubObject.Property1);
             Assert.IsNull(result.SubObject.Property2);
-            Assert.IsNull(result.SubObject.Property3);
+            Assert.AreEqual(0, result.SubObject.Property3);
             Assert.IsNull(result.SubObject.SubObject);
         }
 
@@ -157,22 +157,34 @@ namespace ObjectFilter.Tests
             var result = filter.Process<TestObject>();
             Assert.IsNull(result.Property1);
             Assert.IsNull(result.Property2);
-            Assert.IsNull(result.Property3);
+            Assert.AreEqual(0, result.Property3);
             Assert.AreEqual("S1", result.SubObject.Property1);
             Assert.AreEqual("S2", result.SubObject.Property2);
-            Assert.AreEqual("S3", result.SubObject.Property3);
+            Assert.AreEqual(3, result.SubObject.Property3);
             Assert.AreEqual("SS1", result.SubObject.SubObject.Property1);
             Assert.IsNull(result.SubObject.SubObject.Property2);
-            Assert.IsNull(result.SubObject.SubObject.Property3);
+            Assert.AreEqual(0, result.SubObject.SubObject.Property3);
         }
 
+        [Test]
+        public void Serialization()
+        {
+            var filters = new[] { "*" };
+            var filter = new FilterProcessor(TestData, filters);
+
+            var result = (TestObject)filter.Process();
+            Assert.AreEqual(result.Property1, "1");
+            Assert.AreEqual(result.SubObject.Property2, "S2");
+            Assert.AreEqual(3, result.SubObject.SubObject.Property3);
+            Assert.IsNull(result.SubObject.SubObject.SubObject);
+        }
     }
 
     public class TestObject
     {
         public string Property1 { get; set; }
         public string Property2 { get; set; }
-        public string Property3 { get; set; }
+        public int Property3 { get; set; }
         public TestObject SubObject { get; set; }
     }
 }

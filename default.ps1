@@ -20,7 +20,7 @@ $script:isEnvironmentInitialized = $false
 $script:ilmergeTargetFramework = ""
 $script:msBuildTargetFramework = ""	
 $ilMergeKey = "$srcDir\NServiceBus.snk"
-$script:packageVersion = "0.0.1.5"
+$script:packageVersion = "0.0.1.6"
 $nunitexec = "packages\NUnit.Runners.lite.2.6.0.12051\nunit-console.exe"
 $script:nunitTargetFramework = "/framework=4.0";
 
